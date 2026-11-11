@@ -1,4 +1,4 @@
-# 📞 Solution VoIP multisite sécurisée — Cisco CME, Asterisk et OPNsense
+#  Solution VoIP multisite sécurisée — Cisco CME, Asterisk et OPNsense
 
 > Projet de fin de session — Téléphonie IP · AEC Sécurité informatique et réseaux, Collège Ellis
 > **Kanga Koffi Sadrac (KKS)** — novembre 2026
@@ -9,7 +9,7 @@ et dans un laboratoire VMware Workstation, puis validée par **43 tests**.
 
 ![Architecture](docs/architecture.png)
 
-## 🎯 Objectifs
+##  Objectifs
 
 - Relier les deux sites par une téléphonie commune (plan de numérotation 1xx / 2xx)
 - Séparer la voix et les données (VLAN voix, routage inter-VLAN)
@@ -18,7 +18,7 @@ et dans un laboratoire VMware Workstation, puis validée par **43 tests**.
 - Protéger le serveur d'appels (pare-feu, isolement des sites, fail2ban)
 - Prouver chaque résultat par un test et une capture
 
-## 🧩 Les trois volets
+##  Les trois volets
 
 | Volet | Environnement | Contenu |
 |---|---|---|
@@ -26,7 +26,7 @@ et dans un laboratoire VMware Workstation, puis validée par **43 tests**.
 | **B** | VMware Workstation | **OPNsense** (routeur-pare-feu entre 3 réseaux), **Asterisk 20 / PJSIP** sur Ubuntu Server 24.04, 14 postes créés par script, files d'attente, accueil, messagerie vocale, **MicroSIP**, **SIP over TLS + SRTP** obligatoire, UFW, fail2ban |
 | **C** | Appareils du volet B | **ACL** (OPNsense et UFW), limiteur de trafic OPNsense (files 70 / 20 / 10), marquage **DSCP EF (46)** et **CS3 (24)**, analyse des appels dans **Wireshark** |
 
-## 🧰 Technologies
+##  Technologies
 
 | Rôle | Solution |
 |---|---|
@@ -38,7 +38,7 @@ et dans un laboratoire VMware Workstation, puis validée par **43 tests**.
 | Analyse | Wireshark, tcpdump |
 | Virtualisation | VMware Workstation |
 
-## 🌐 Plan d'adressage
+##  Plan d'adressage
 
 **Volet A — Packet Tracer**
 
@@ -59,7 +59,7 @@ et dans un laboratoire VMware Workstation, puis validée par **43 tests**.
 | LAN_MONTREAL | em3 | 192.168.50.0/24 | PC-MTL (MicroSIP) |
 | WAN | em0 | DHCP (NAT) | Accès Internet |
 
-## 🔐 Points de sécurité mis en œuvre
+##  Points de sécurité mis en œuvre
 
 - **Chiffrement de bout en bout** : VPN IPsec AES-256 entre les sites (volet A), SIP over TLS sur le port 5061 et SRTP obligatoire (`media_encryption_optimistic=no`) dans le volet B.
 - **Isolement des sites** : les postes de Longueuil et de Montréal ne se joignent jamais directement ; OPNsense ne laisse passer que la signalisation et l'audio vers Asterisk.
@@ -68,7 +68,7 @@ et dans un laboratoire VMware Workstation, puis validée par **43 tests**.
 - **Secrets protégés** : mots de passe SIP et NIP aléatoires générés par script, fichiers en 640 (`root:asterisk`), clé privée TLS en 600.
 - **Durcissement Cisco** : SSH v2 seulement, ports inutilisés désactivés, bannière d'avertissement.
 
-## ✅ Résultats
+##  Résultats
 
 | Mesure | Résultat |
 |---|---|
@@ -81,7 +81,7 @@ et dans un laboratoire VMware Workstation, puis validée par **43 tests**.
 
 Détail : [tests/plan-de-tests.md](tests/plan-de-tests.md) — rapport complet : [docs/Rapport_VoIP_Kanga.pdf](docs/Rapport_VoIP_Kanga.pdf)
 
-## 🧩 Défis rencontrés
+##  Défis rencontrés
 
 | Problème | Cause | Solution |
 |---|---|---|
@@ -93,7 +93,7 @@ Détail : [tests/plan-de-tests.md](tests/plan-de-tests.md) — rapport complet :
 
 Les 22 problèmes sont documentés dans [docs/journal-des-problemes.md](docs/journal-des-problemes.md).
 
-## 📁 Contenu du dépôt
+##  Contenu du dépôt
 
 ```
 ├── README.md
@@ -108,7 +108,7 @@ Les 22 problèmes sont documentés dans [docs/journal-des-problemes.md](docs/jou
 └── captures/        Preuves des tests
 ```
 
-## ⚠️ Limites du prototype
+## Limites du prototype
 
 Un seul serveur Asterisk (point de défaillance unique), certificat autosigné, aucun trunk SIP vers un fournisseur,
 annonces en anglais. En production : serveurs d'appels redondants, certificat d'une autorité reconnue,
