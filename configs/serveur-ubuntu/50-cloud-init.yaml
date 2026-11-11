@@ -1,0 +1,12 @@
+# /etc/netplan/50-cloud-init.yaml – adresse fixe du serveur Asterisk (chmod 600)
+network:
+  version: 2
+  ethernets:
+    ens33:
+      dhcp4: false
+      addresses: [10.10.10.10/24]
+      routes:
+        - to: default
+          via: 10.10.10.254
+      nameservers:
+        addresses: [10.10.10.254, 8.8.8.8]

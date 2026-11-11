@@ -1,0 +1,6 @@
+; Extrait de modules.conf : ces lignes doivent etre dans la section [modules], avant [global]
+[modules]
+autoload=yes
+noload => chan_sip.so
+noload => app_voicemail_odbc.so
+noload => app_voicemail_imap.so

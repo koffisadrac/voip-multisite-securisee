@@ -1,0 +1,12 @@
+# /etc/fail2ban/jail.d/asterisk.local
+# Prerequis : messages.log => notice,warning,error dans /etc/asterisk/logger.conf
+[asterisk]
+enabled  = true
+filter   = asterisk
+port     = 5060,5061
+protocol = all
+logpath  = /var/log/asterisk/messages.log
+backend  = polling
+maxretry = 5
+bantime  = 1h
+ignoreip = 127.0.0.1/8 10.10.10.0/24

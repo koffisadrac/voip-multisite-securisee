@@ -1,0 +1,119 @@
+! ============================================================
+! R-Longueuil – routeur 2901, Cisco CME du site de Longueuil
+! Projet VoIP multisite – Kanga Koffi Sadrac (Cisco Packet Tracer)
+! Les mots de passe et la cle VPN sont remplaces par <...>
+! ============================================================
+
+! --- Licences (voix et securite), actives apres redemarrage ---
+license boot module c2900 technology-package uck9
+license boot module c2900 technology-package securityk9
+end
+write memory
+reload
+
+! --- Securisation de base ---
+enable secret <mot-de-passe>
+service password-encryption
+no ip domain-lookup
+banner motd #Acces reserve au personnel autorise#
+ip domain-name abcservices.local
+username admin secret <mot-de-passe>
+crypto key generate rsa
+! taille de la cle : 1024
+ip ssh version 2
+line console 0
+ login local
+ exec-timeout 10 0
+line vty 0 4
+ login local
+ transport input ssh
+
+hostname R-Longueuil
+!
+ip dhcp excluded-address 192.168.10.1 192.168.10.10
+ip dhcp excluded-address 192.168.20.1 192.168.20.10
+ip dhcp pool DATA_LGU
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 8.8.8.8
+ip dhcp pool VOICE_LGU
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.1
+ option 150 ip 192.168.20.1
+!
+class-map match-any VOIX
+ match ip dscp ef
+policy-map QOS_VOIP
+ class VOIX
+  priority percent 33
+ class class-default
+  fair-queue
+!
+interface GigabitEthernet0/0
+ no shutdown
+interface GigabitEthernet0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+interface GigabitEthernet0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+!
+interface Serial0/0/0
+ description WAN vers Montreal
+ ip address 10.0.0.1 255.255.255.252
+ clock rate 2000000
+ bandwidth 2000
+ service-policy output QOS_VOIP
+ no shutdown
+!
+ip route 192.168.40.0 255.255.255.0 10.0.0.2
+ip route 192.168.50.0 255.255.255.0 10.0.0.2
+!
+telephony-service
+ max-ephones 7
+ max-dn 7
+ ip source-address 192.168.20.1 port 2000
+ auto assign 1 to 7
+!
+ephone-dn 1
+ number 101
+ephone-dn 2
+ number 102
+ephone-dn 3
+ number 103
+ephone-dn 4
+ number 104
+ephone-dn 5
+ number 105
+ephone-dn 6
+ number 106
+ephone-dn 7
+ number 107
+!
+dial-peer voice 1 voip
+ destination-pattern 2..
+ session target ipv4:10.0.0.2
+
+! --- VPN IPsec vers R-MONTREAL ---
+crypto isakmp policy 10
+ encryption aes 256
+ hash sha
+ authentication pre-share
+ group 5
+ lifetime 86400
+crypto isakmp key <cle-vpn> address 10.0.0.2
+!
+crypto ipsec transform-set VPN-SET esp-aes 256 esp-sha-hmac
+!
+access-list 110 permit ip 192.168.10.0 0.0.0.255 192.168.40.0 0.0.0.255
+access-list 110 permit ip 192.168.10.0 0.0.0.255 192.168.50.0 0.0.0.255
+access-list 110 permit ip 192.168.20.0 0.0.0.255 192.168.40.0 0.0.0.255
+access-list 110 permit ip 192.168.20.0 0.0.0.255 192.168.50.0 0.0.0.255
+!
+crypto map VPN-MAP 10 ipsec-isakmp
+ set peer 10.0.0.2
+ set transform-set VPN-SET
+ match address 110
+!
+interface Serial0/0/0
+ crypto map VPN-MAP
